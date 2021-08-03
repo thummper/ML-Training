@@ -178,10 +178,12 @@ def trainModel(model, optimizer, criterion, startEpoch, endEpoch, trainLoader, s
                         #tqdm.write("New best valid model: " + str(runningLoss) + " beats: " + str(bestValid))
                         bestValid = runningLoss
                         saveModel(model, modelName, savePath, runningLoss, phase, i, modelLogPath)
+        # Feather log should fire on each epoch right?
+        writeFeatherLog(modelInfo, featherPath)
+    # Epochs have finished.
     writeLog(
         content  = "Finished Training",
         logPath  = modelLogPath
     )
-    # Feather log should fire on each epoch right?
-    writeFeatherLog(modelInfo, featherPath)
+
 
