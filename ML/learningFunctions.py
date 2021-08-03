@@ -10,6 +10,11 @@ from time import time
 import os
 
 
+def writeFeatherLog(content, path):
+    infoFrame = pd.DataFrame(content)
+    infoFrame.to_feather(path)
+
+
 def writeLog(content, logPath, resetLog = False):
     # Open Log
     modelLog = open(logPath, 'a+')
@@ -50,6 +55,8 @@ def trainModel(model, optimizer, criterion, startEpoch, endEpoch, trainLoader, s
     bestValid = np.inf
     # Make text file to store generic outputs
     modelLogPath = os.path.join(savePath, modelName + "_textLog.txt")
+    featherPath = os.path.join(savePath, modelName + ".feather")
+
     writeLog(
         content  = "Training Model: " + modelName,
         logPath  = modelLogPath,
@@ -171,11 +178,10 @@ def trainModel(model, optimizer, criterion, startEpoch, endEpoch, trainLoader, s
                         #tqdm.write("New best valid model: " + str(runningLoss) + " beats: " + str(bestValid))
                         bestValid = runningLoss
                         saveModel(model, modelName, savePath, runningLoss, phase, i, modelLogPath)
-
     writeLog(
         content  = "Finished Training",
         logPath  = modelLogPath
     )
+    # Feather log should fire on each epoch right?
+    writeFeatherLog(modelInfo, featherPath)
 
-    infoFrame = pd.DataFrame(modelInfo)
-    infoFrame.to_feather(os.path.join(savePath, modelName + ".feather"))
