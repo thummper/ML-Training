@@ -48,7 +48,7 @@ classLabels = {
 }
 
 # Fold source needs to be correct
-FOLD_SOURCE = "/home/lunet/coab5/GEODATA/Fold Blocks"
+FOLD_SOURCE = "/home/lunet/coab5/GEODATA/3 BAND"
 SAVE_PATH = "/home/lunet/coab5/SAVED_MODELS"
 
 #print(pd.read_feather("/home/lunet/coab5/GEODATA/Fold Blocks/TrainInfo.feather"))
@@ -88,21 +88,18 @@ if os.path.exists(FOLD_SOURCE):
     model.to(device)
     criterion   = nn.CrossEntropyLoss()
     optimizer   = optim.Adam(model.parameters())
-
     print("Training Model, Saving: ", SAVE_PATH)
-
-
-
 
 
     trainModel(
         model = model,
         optimizer = optimizer,
         criterion = criterion,
-        epochs = 10,
+        startEpoch = 0,
+        endEpoch = 75,
         trainLoader = trainLoader,
         savePath = SAVE_PATH,
-        modelName = "TempCNN_3Channels",
+        modelName = "TempCNN_3Channels_Scratch",
         validLoader = validLoader,
         device = device
     )
