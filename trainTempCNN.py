@@ -75,7 +75,9 @@ if os.path.exists(FOLD_SOURCE):
     # trainLoader = DataLoader(trainData, batch_size = 512, shuffle = False, sampler = torch.utils.data.SubsetRandomSampler(trainIndices))
     # validLoader = DataLoader(trainData, batch_size = 512, shuffle = False, sampler = torch.utils.data.SubsetRandomSampler(validIndices))
     trainLoader = DataLoader(trainData, batch_size = 2048, shuffle = False)
-    validLoader = DataLoader(trainData, batch_size = 2048, shuffle = False)
+    validLoader = DataLoader(validData, batch_size = 2048, shuffle = False)
+
+
 
 
     modelargs = {
@@ -96,10 +98,10 @@ if os.path.exists(FOLD_SOURCE):
         optimizer = optimizer,
         criterion = criterion,
         startEpoch = 0,
-        endEpoch = 75,
+        endEpoch = 45,
         trainLoader = trainLoader,
         savePath = SAVE_PATH,
-        modelName = "TempCNN_3Channels_Scratch",
+        modelName = "TempCNN_3Channels_Fixed",
         validLoader = validLoader,
         device = device
     )
