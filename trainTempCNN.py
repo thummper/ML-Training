@@ -59,14 +59,14 @@ if os.path.exists(FOLD_SOURCE):
     trainData = BlockDataset(
         source = FOLD_SOURCE,
         datasetType = "Train",
-        #generateIndex = True,
-        blockInfo =  os.path.join(FOLD_SOURCE, "TrainInfo.feather"),
+        generateIndex = True,
+        #blockInfo =  os.path.join(FOLD_SOURCE, "TrainInfo.feather"),
     )
     validData = BlockDataset(
         source = FOLD_SOURCE,
         datasetType = "Valid",
-        #generateIndex = True,
-        blockInfo =  os.path.join(FOLD_SOURCE, "ValidInfo.feather"),
+        generateIndex = True,
+        #blockInfo =  os.path.join(FOLD_SOURCE, "ValidInfo.feather"),
     )
 
     # trainIndices = range(4096)
@@ -87,7 +87,22 @@ if os.path.exists(FOLD_SOURCE):
     }
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     model = TempCNN(**modelargs)
+
+    print("We are pretraining")
+
+    MODEL_DIR = "SOME_PATH"
     model.to(device)
+    model.load_state_dict(torch.load(MODEL_DIR))
+
+    # Replace 3 band with 13 band
+    replaceConv = nn.Conv1d(13, 64, 5, stride=1, padding=2)
+    model.conv_bn_relu1.block[0] = replaceConv
+
+
+
+
+
+
     criterion   = nn.CrossEntropyLoss()
     optimizer   = optim.Adam(model.parameters())
     print("Training Model, Saving: ", SAVE_PATH)
@@ -101,7 +116,7 @@ if os.path.exists(FOLD_SOURCE):
         endEpoch = 45,
         trainLoader = trainLoader,
         savePath = SAVE_PATH,
-        modelName = "TempCNN_3Channels_Fixed",
+        modelName = "TempCNN_13BAND_PRE",
         validLoader = validLoader,
         device = device
     )

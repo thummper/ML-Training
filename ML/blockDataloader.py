@@ -128,11 +128,37 @@ class BlockDataset(Dataset):
                 # We can calculate NDVI from band values and return that in a correctly formatted PyTorch tensor
                 # ['date', 'B08', 'B04', 'B02', 'cropClass', 'foldNumber']
 
-                sampleClass = returnData['cropClass'].astype(np.int32)
 
-                b8 = returnData['B08'].astype(np.float32)
-                b4 = returnData['B04'].astype(np.float32)
-                b2 = returnData['B02'].astype(np.float32)
+                dataIndex = returnData.index.tolist()
+                if(len(dataIndex) > 6):
+                    b1  = returnData['B01'].astype(np.float32)
+                    b2  = returnData['B02'].astype(np.float32)
+                    b3  = returnData['B03'].astype(np.float32)
+                    b4  = returnData['B04'].astype(np.float32)
+                    b5  = returnData['B05'].astype(np.float32)
+                    b6  = returnData['B06'].astype(np.float32)
+                    b7  = returnData['B07'].astype(np.float32)
+                    b8  = returnData['B08'].astype(np.float32)
+                    b8a = returnData['B8A'].astype(np.float32)
+                    b9  = returnData['B09'].astype(np.float32)
+                    b10 = returnData['B10'].astype(np.float32)
+                    b11 = returnData['B11'].astype(np.float32)
+                    b12 = returnData['B12'].astype(np.float32)
+                    x = torch.from_numpy(np.array([b1, b2, b3, b4, b5, b6, b7, b8, b8a, b9, b10, b11, b12]))
+                else:
+                    b8 = returnData['B08'].astype(np.float32)
+                    b4 = returnData['B04'].astype(np.float32)
+                    b2 = returnData['B02'].astype(np.float32)
+                    x = torch.from_numpy(np.array([b8, b4, b2]))
+
+
+
+
+
+
+
+
+
 
                 # b8[b8 == 0] = np.nan
                 # b4[b4 == 0] = np.nan
@@ -140,17 +166,13 @@ class BlockDataset(Dataset):
                 # ndvi = np.nan_to_num(ndvi)
 
 
-                x = torch.from_numpy(np.array([b8, b4, b2]))
+
 
 
                 # x = torch.unsqueeze(torch.from_numpy(ndvi), 0)
                 #rint(x.shape)
-
-
+                sampleClass = returnData['cropClass'].astype(np.int32)
                 y = torch.tensor(sampleClass, dtype = torch.int64)
-
-
-
                 return x, y
 
                 # returnData = {
@@ -176,35 +198,42 @@ class BlockDataset(Dataset):
         blockList = os.listdir(blockDirectory)
 
         totalLength = 0
-        blockInfo = []
+        blockInfo   = []
+
+
 
 
 
         for ind, block in enumerate(tqdm(blockList, desc = " Loading Blocks")):
 
             blockPath = os.path.join(blockDirectory, block)
+            #print("Loading: ", blockPath)
             loadBlock = pd.read_feather(blockPath)
 
-            # print("Reading: ", blockPath)
-            # print("Block Length: ", len(loadBlock))
+            print(loadBlock)
+
+            print("Reading: ", blockPath)
+            print("Block Length: ", len(loadBlock))
 
             blockLength = len(loadBlock)
-            customIndex = range(totalLength, totalLength + blockLength)
 
-            if self.generateIndex:
-                loadBlock['loaderIndex'] = customIndex
-                loadBlock.to_feather(blockPath)
+            if blockLength > 0:
+                customIndex = range(totalLength, totalLength + blockLength)
+
+                if self.generateIndex:
+                    loadBlock['loaderIndex'] = customIndex
+                    loadBlock.to_feather(blockPath)
 
 
 
-            if self.blockInfo is None:
-                blockInfo.append({
-                    'blockName' : block,
-                    'startInd' : customIndex[0],
-                    'endInd': customIndex[-1]
-                })
+                if self.blockInfo is None:
+                    blockInfo.append({
+                        'blockName' : block,
+                        'startInd' : customIndex[0],
+                        'endInd': customIndex[-1]
+                    })
 
-            totalLength += len(loadBlock)
+                totalLength += len(loadBlock)
         # If we don't have input block info, generate the frame and save
         if self.blockInfo is None:
             self.blockInfo = pd.DataFrame(blockInfo)
